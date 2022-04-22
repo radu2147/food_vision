@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/models/prediction.dart';
 import 'package:food_vision/screens/error_screen.dart';
-import 'package:food_vision/screens/error_screen_2.dart';
 import 'package:food_vision/screens/fitness_app_theme.dart';
 import 'package:food_vision/screens/info_screen.dart';
 import 'package:food_vision/screens/loading_screen.dart';
-import 'package:food_vision/service/view_model.dart';
+import 'package:food_vision/service/food_view_model.dart';
 import 'package:food_vision/widgets/app_bar.dart';
+import 'package:provider/provider.dart';
 
 import 'app_theme.dart';
 
@@ -98,28 +98,38 @@ class _PredictionScreenState extends State<PredictionScreen> with TickerProvider
     );
   }
 
-  FutureBuilder<Prediction> _build(BuildContext context){
-    return FutureBuilder(builder: (context, snapshot){
-      if(snapshot.connectionState == ConnectionState.done && !snapshot.hasError){
-        Prediction data = snapshot.data!;
-        if(data.prediction < .6){
-          return _getCameraPic(
-              ErrorScreen(error: "No food detected")
-          );
-        }
-
-        return _getCameraPic(InfoScreen(imageFile: widget.imageFile, service: widget.service, prediction: data, mealType: widget.mealType));
-      }
-      else if(snapshot.hasError) {
+  Widget _build(BuildContext context) {
+    if (Provider
+        .of<FoodViewModel>(context)
+        .loading) {
+      return const LoadingScreen();
+    }
+    if (Provider
+        .of<FoodViewModel>(context)
+        .error != null) {
+      return _getCameraPic(
+          ErrorScreen(error: "Error calling the api")
+      );
+    }
+    if (Provider
+        .of<FoodViewModel>(context)
+        .error == null) {
+      Prediction data = Provider
+          .of<FoodViewModel>(context)
+          .prediction!;
+      if (data.prediction < .6) {
         return _getCameraPic(
-            ErrorScreen(error: "Error calling the api")
+            ErrorScreen(error: "No food detected")
         );
       }
-      else {
-        return const LoadingScreen();
-      }
-    },
-    future: widget.service.predictImage(widget.imageFile),
+      return _getCameraPic(InfoScreen(imageFile: widget.imageFile,
+          prediction: data,
+          mealType: widget.mealType));
+    }
+    return _getCameraPic(
+        ErrorScreen(error: Provider.of<FoodViewModel>(context).error!.message)
     );
   }
+
+
 }

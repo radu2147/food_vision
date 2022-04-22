@@ -1,11 +1,11 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/models/tablcon_data.dart';
+import 'package:food_vision/screens/auth_screen.dart';
 import 'package:food_vision/screens/my_diary_screen.dart';
 import 'package:food_vision/screens/training_screen.dart';
+import 'package:food_vision/service/auth_view_model.dart';
 import 'package:food_vision/service/food_view_model.dart';
-import 'package:food_vision/service/view_model.dart';
 import 'package:food_vision/widgets/bottom_bar_view.dart';
 import 'package:provider/provider.dart';
 
@@ -56,29 +56,13 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    if(Provider.of<AuthViewModel>(context).error != null){
+      return AuthScreen();
+    }
     if(widget.asnyc) {
       return Scaffold(
           backgroundColor: Colors.transparent,
-          body: FutureBuilder<List<Meal>>(
-            future: getData(),
-            builder: (BuildContext context, AsyncSnapshot<List<Meal>> snapshot) {
-              if (!snapshot.hasData) {
-                return Stack(
-                    children: const <Widget>[
-                      LoadingScreen()
-                    ],
-                );
-              } else {
-                var data = snapshot.data!;
-                return Stack(
-                  children: <Widget>[
-                    MyDiaryScreen(data: data, animationController: animationController),
-                    bottomBar(data),
-                  ],
-                );
-              }
-            },
-          ),
+          body: _getWidget(context)
         );
     }
     return Scaffold(
@@ -94,8 +78,22 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
       );
   }
 
-  Future<List<Meal>> getData() async {
-      return await Provider.of<FoodViewModel>(context, listen: false).getAll();
+  Widget _getWidget(BuildContext context){
+    if (Provider.of<FoodViewModel>(context).loading) {
+      return Stack(
+        children: const <Widget>[
+          LoadingScreen()
+        ],
+      );
+    } else {
+      var data = Provider.of<FoodViewModel>(context).data!;
+      return Stack(
+        children: <Widget>[
+          MyDiaryScreen(data: data, animationController: animationController),
+          bottomBar(data),
+        ],
+      );
+    }
   }
 
   Widget bottomBar(List<Meal> lst) {

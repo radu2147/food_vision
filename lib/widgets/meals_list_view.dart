@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/models/meals_list_data.dart';
+import 'package:food_vision/screens/camera_screen.dart';
 import 'package:food_vision/screens/fitness_app_theme.dart';
 
 import 'hex_color.dart';
@@ -237,14 +238,14 @@ class MealsView extends StatelessWidget {
                                       blurRadius: 8.0),
                                 ],
                               ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(6.0),
-                                child: Icon(
-                                  Icons.add,
+                              child: IconButton(
+                                  icon: Icon(Icons.add,
                                   color: HexColor(mealsListData!.endColor),
                                   size: 24,
+                                  ), onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => CameraScreen(mealType: mealsListData?.titleTxt,)));
+                                },
                                 ),
-                              ),
                             ),
                           ],
                         ),

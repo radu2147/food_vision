@@ -1,15 +1,14 @@
 import 'dart:io';
 
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/models/nutritional_values.dart';
 import 'package:food_vision/models/prediction.dart';
 import 'package:food_vision/models/user.dart';
 import 'package:food_vision/screens/fitness_app_home_screen.dart';
-import 'package:food_vision/service/view_model.dart';
+import 'package:food_vision/service/food_view_model.dart';
 import 'package:food_vision/widgets/counter_view.dart';
+import 'package:provider/provider.dart';
 
 import 'app_theme.dart';
 import 'fitness_app_theme.dart';
@@ -19,9 +18,8 @@ class InfoScreen extends StatefulWidget {
   File imageFile;
   Prediction prediction;
   MealType? mealType;
-  ViewModel service;
 
-  InfoScreen({Key? key, required this.imageFile, required this.prediction, this.mealType, required this.service}) : super(key: key);
+  InfoScreen({Key? key, required this.imageFile, required this.prediction, this.mealType}) : super(key: key);
 
   @override
   _InfoScreenState createState() => _InfoScreenState();
@@ -35,6 +33,7 @@ class _InfoScreenState extends State<InfoScreen>
   double opacity1 = 0.0;
   double opacity2 = 0.0;
   double opacity3 = 0.0;
+  late MealType dropdownValue;
 
   @override
   void initState() {
@@ -43,8 +42,15 @@ class _InfoScreenState extends State<InfoScreen>
     animation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
         parent: animationController!,
         curve: const Interval(0, 1.0, curve: Curves.fastOutSlowIn)));
+    dropdownValue = widget.mealType ?? MealType.Breakfast;
     setData();
     super.initState();
+  }
+
+  @override
+  void dispose(){
+    animationController?.dispose();
+    super.dispose();
   }
 
   Future<void> setData() async {
@@ -68,7 +74,7 @@ class _InfoScreenState extends State<InfoScreen>
     final double tempHeight = MediaQuery.of(context).size.height -
         (MediaQuery.of(context).size.width / 1.2) +
         24.0;
-    MealType dropdownValue = widget.mealType ?? MealType.Breakfast;
+
     return Padding(
                   padding: const EdgeInsets.only(left: 8, right: 8),
                   child: SingleChildScrollView(
@@ -240,7 +246,7 @@ class _InfoScreenState extends State<InfoScreen>
                                           color: Colors.transparent,
                                           child: InkWell(
                                             onTap: () async{
-                                              widget.service.add(Meal(
+                                              Provider.of<FoodViewModel>(context, listen:false).add(Meal(
                                                   name: widget.prediction.foodClass,
                                                   mealType: dropdownValue,
                                                   date: DateTime.now(),
@@ -252,11 +258,11 @@ class _InfoScreenState extends State<InfoScreen>
                                                     fat: 5.0,
                                                     carbs: 7.0
                                                   ),
-
                                               ));
-                                              Navigator.popUntil(context, (route) => route.isFirst);
-                                              final cameras = await availableCameras();
-                                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FitnessAppHomeScreen(cameras: cameras, service: widget.service, asnyc: true)));
+                                              Provider.of<FoodViewModel>(context, listen: false).getAll();
+                                              Navigator.pop(context);
+                                              Navigator.pop(context);
+                                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FitnessAppHomeScreen(asnyc: true)));
                                             },
                                             splashColor: Colors.white.withOpacity(0.1),
                                             highlightColor: Colors.transparent,

@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:food_vision/error/auth_error.dart';
 import 'package:food_vision/error/food_error.dart';
 import 'package:food_vision/models/user.dart';
 
@@ -9,15 +11,40 @@ class AuthViewModel with ChangeNotifier{
 
   Token? data;
   bool loading = false;
-  FoodError? error;
+  AuthError? error;
 
   AuthViewModel(this.api);
 
-  Future<Token> login(User user) async{
-    return await api.login(user.username, user.password);
+  Future login(User user) async{
+    loading = true;
+    notifyListeners();
+    try {
+      data = await api.login(user.username, user.password);
+      _writeToStorage();
+      error = null;
+    } catch(e){
+      error = AuthError(e.toString());
+    }
+    loading = false;
+    notifyListeners();
   }
 
-  Future<Token> register(User user) async{
-    return await api.register(user.username, user.password);
+  void _writeToStorage() {
+    var storage = const FlutterSecureStorage();
+    storage.write(key: "token", value: data!.access_token);
+  }
+
+  Future register(User user) async{
+    loading = true;
+    notifyListeners();
+    try {
+      data = await api.register(user.username, user.password);
+      _writeToStorage();
+      error = null;
+    } catch(e){
+      error = AuthError(e.toString());
+    }
+    loading = false;
+    notifyListeners();
   }
 }

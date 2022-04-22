@@ -1,4 +1,3 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +5,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:food_vision/models/user.dart';
 import 'package:food_vision/screens/fitness_app_home_screen.dart';
 import 'package:food_vision/screens/fitness_app_theme.dart';
-import 'package:food_vision/service/auth_service.dart';
 import 'package:food_vision/service/auth_view_model.dart';
-import 'package:food_vision/service/view_model.dart';
+import 'package:food_vision/service/food_view_model.dart';
 import 'package:provider/provider.dart';
 
 class AuthScreen extends StatelessWidget{
@@ -50,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _isVisible = Provider.of<AuthViewModel>(context).error != null;
     return SingleChildScrollView(
         reverse: true,
         padding: EdgeInsets.all(20),
@@ -166,9 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () async {
                     var username = usernameController.value.text;
                     var password = passwordController.value.text;
-                    var resp = await Provider.of<AuthViewModel>(context, listen: false).login(User(username: username, password: password));
-                    var writer = const FlutterSecureStorage();
-                    writer.write(key: "token", value: resp.access_token);
+                    await Provider.of<AuthViewModel>(context, listen: false).login(User(username: username, password: password)).timeout(const Duration(seconds: 10));
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => FitnessAppHomeScreen(asnyc: true,)));
                   }),
             ),
@@ -388,9 +385,8 @@ class _SignupPageContent extends State<SignupPageContent> {
                   if (usernameController.text != "" &&
                       passwordController1.text == passwordController2.text &&
                       passwordController2.text != "") {
-                    var resp = await Provider.of<AuthViewModel>(context, listen: false).register(User(username: usernameController.value.text, password: passwordController1.value.text));
-                    var writer = const FlutterSecureStorage();
-                    writer.write(key: "token", value: resp.access_token);
+                    await Provider.of<AuthViewModel>(context, listen: false).register(User(username: usernameController.value.text, password: passwordController1.value.text));
+                    await Provider.of<FoodViewModel>(context, listen: false).getAll();
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => FitnessAppHomeScreen(asnyc: true,)));
                   } else {
                     setState(() {
