@@ -5,7 +5,8 @@ import 'package:food_vision/screens/fitness_app_theme.dart';
 class CounterView extends StatefulWidget {
   final int initNumber;
   final int minNumber;
-  CounterView({required this.initNumber,  required this.minNumber});
+  Function? onChange;
+  CounterView({required this.initNumber,  required this.minNumber, this.onChange});
   @override
   _CounterViewState createState() => _CounterViewState();
 }
@@ -45,6 +46,7 @@ class _CounterViewState extends State<CounterView> {
   void _increment() {
     setState(() {
       _currentCount++;
+      widget.onChange?.call(_currentCount);
     });
   }
 
@@ -52,6 +54,7 @@ class _CounterViewState extends State<CounterView> {
     setState(() {
       if (_currentCount > _minNumber) {
         _currentCount--;
+        widget.onChange?.call(_currentCount);
       }
     });
   }

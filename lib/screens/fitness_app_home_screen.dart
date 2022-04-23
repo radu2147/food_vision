@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/models/tablcon_data.dart';
 import 'package:food_vision/screens/auth_screen.dart';
+import 'package:food_vision/screens/error_screen.dart';
 import 'package:food_vision/screens/my_diary_screen.dart';
 import 'package:food_vision/screens/training_screen.dart';
 import 'package:food_vision/service/auth_view_model.dart';
@@ -85,15 +86,17 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
           LoadingScreen()
         ],
       );
-    } else {
-      var data = Provider.of<FoodViewModel>(context).data!;
-      return Stack(
-        children: <Widget>[
-          MyDiaryScreen(data: data, animationController: animationController),
-          bottomBar(data),
-        ],
-      );
     }
+    if(Provider.of<FoodViewModel>(context).error != null){
+      return ErrorScreen(error: Provider.of<FoodViewModel>(context).error!.message,);
+    }
+    var data = Provider.of<FoodViewModel>(context).data!;
+    return Stack(
+      children: <Widget>[
+        MyDiaryScreen(data: data, animationController: animationController),
+        bottomBar(data),
+      ],
+    );
   }
 
   Widget bottomBar(List<Meal> lst) {

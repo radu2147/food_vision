@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:food_vision/error/food_error.dart';
 import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/models/prediction.dart';
 import 'package:path/path.dart';
@@ -14,15 +15,15 @@ class FoodApiCall{
   Future addMeal(Meal meal) async {
     var uri = Uri.parse("$url/meal");
     var token = await FlutterSecureStorage().read(key: "token");
-    var resp = await http.post(uri, body: jsonEncode(meal.toJson()), headers: {"Content-type": "application/json", "Authorization": "Bearer ${token ?? ""}"}).timeout(const Duration(seconds: 10));
+    var resp = await http.post(uri, body: jsonEncode(meal.toJson()), headers: {"Content-type": "application/json", "Authorization": "Bearer ${token ?? ""}"}).timeout(const Duration(seconds: 20));
     var body = jsonDecode(resp.body);
   }
 
-  Future<List<Meal>> getMealsOfToday() async{
+  Future<List<Meal>> getMealsOfToday(DateTime date) async{
     var storage = const FlutterSecureStorage();
     String? token = await storage.read(key: "token");
-    var uri = Uri.parse("$url/meal?datetime=${DateTime.now()}");
-    var resp = await http.get(uri, headers: {"Authorization": "Bearer ${token ?? ""}"}).timeout(const Duration(seconds: 10));
+    var uri = Uri.parse("$url/meal?datetime=$date");
+    var resp = await http.get(uri, headers: {"Authorization": "Bearer ${token ?? ""}"}).timeout(const Duration(seconds: 20));
     List<dynamic> values = jsonDecode(resp.body);
     List<Meal> fin = [];
     if (values.isNotEmpty) {
@@ -46,8 +47,12 @@ class FoodApiCall{
     var request = http.MultipartRequest("POST", uri);
     var multipartFile = http.MultipartFile("file", stream, length, filename: basename(imageFile.path));
     request.files.add(multipartFile);
-    var response =    await request.send().timeout(const Duration(seconds: 40));
+    var response = await request.send().timeout(const Duration(seconds: 40));
     var respBody = await http.Response.fromStream(response);
+    if(respBody.statusCode != 200){
+      var error = jsonDecode(respBody.body);
+      throw Exception(error["detail"]);
+    }
 
     return Prediction.fromJson(jsonDecode(respBody.body));
   }

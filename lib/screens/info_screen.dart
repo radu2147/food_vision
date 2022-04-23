@@ -5,8 +5,8 @@ import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/models/nutritional_values.dart';
 import 'package:food_vision/models/prediction.dart';
 import 'package:food_vision/models/user.dart';
-import 'package:food_vision/screens/fitness_app_home_screen.dart';
 import 'package:food_vision/service/food_view_model.dart';
+import 'package:food_vision/service/add_view_model.dart';
 import 'package:food_vision/widgets/counter_view.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +34,7 @@ class _InfoScreenState extends State<InfoScreen>
   double opacity2 = 0.0;
   double opacity3 = 0.0;
   late MealType dropdownValue;
+  int quantity = 1;
 
   @override
   void initState() {
@@ -56,14 +57,23 @@ class _InfoScreenState extends State<InfoScreen>
   Future<void> setData() async {
     animationController?.forward();
     await Future<dynamic>.delayed(const Duration(milliseconds: 200));
+    if(!mounted) {
+      return;
+    }
     setState(() {
       opacity1 = 1.0;
     });
     await Future<dynamic>.delayed(const Duration(milliseconds: 200));
+    if(!mounted) {
+      return;
+    }
     setState(() {
       opacity2 = 1.0;
     });
     await Future<dynamic>.delayed(const Duration(milliseconds: 200));
+    if(!mounted) {
+      return;
+    }
     setState(() {
       opacity3 = 1.0;
     });
@@ -92,7 +102,7 @@ class _InfoScreenState extends State<InfoScreen>
                             padding: const EdgeInsets.only(
                                 top: 32.0, left: 18, right: 16),
                             child: Row(children: [Text(
-                              widget.prediction.food,
+                              widget.prediction.foodClass,
                               textAlign: TextAlign.left,
                               style: const TextStyle(
                                 fontFamily: FitnessAppTheme.fontName,
@@ -167,9 +177,9 @@ class _InfoScreenState extends State<InfoScreen>
                               padding: const EdgeInsets.all(8),
                               child: Row(
                                 children: <Widget>[
-                                  getTimeBoxUI('576', 'Kcal'),
-                                  getTimeBoxUI('12g', 'Protein'),
-                                  getTimeBoxUI('30g', 'Fat'),
+                                  getTimeBoxUI((576 * quantity).toString(), 'Kcal'),
+                                  getTimeBoxUI('${12 * quantity}g', 'Protein'),
+                                  getTimeBoxUI('${30 * quantity}g', 'Fat'),
                                 ],
                               ),
                             ),
@@ -202,6 +212,11 @@ class _InfoScreenState extends State<InfoScreen>
                                 CounterView(
                                   minNumber: 1,
                                   initNumber: 1,
+                                  onChange: (value) {
+                                    setState(() {
+                                      quantity = value;
+                                    });
+                                  },
                                 ),
                               ),
                             ),
@@ -246,12 +261,13 @@ class _InfoScreenState extends State<InfoScreen>
                                           color: Colors.transparent,
                                           child: InkWell(
                                             onTap: () async{
-                                              Provider.of<FoodViewModel>(context, listen:false).add(Meal(
+                                              await Provider.of<AddViewModel>(context, listen: false).add(Meal(
                                                   name: widget.prediction.foodClass,
                                                   mealType: dropdownValue,
-                                                  date: DateTime.now(),
+                                                  date: Provider.of<FoodViewModel>(context, listen: false).date,
                                                   user: User(username: "", password: ""),
                                                   id: BigInt.from(-1),
+                                                  quantity: quantity,
                                                   nutritionalValues: NutritionalValues(
                                                     kcal: 140,
                                                     protein: 10.0,
@@ -259,10 +275,8 @@ class _InfoScreenState extends State<InfoScreen>
                                                     carbs: 7.0
                                                   ),
                                               ));
-                                              Provider.of<FoodViewModel>(context, listen: false).getAll();
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => FitnessAppHomeScreen(asnyc: true)));
+                                              Navigator.popUntil(context, (route) => route.isFirst);
+                                              await Provider.of<FoodViewModel>(context, listen: false).getAll();
                                             },
                                             splashColor: Colors.white.withOpacity(0.1),
                                             highlightColor: Colors.transparent,

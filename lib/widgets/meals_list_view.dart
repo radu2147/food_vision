@@ -30,8 +30,8 @@ class _MealsListViewState extends State<MealsListView>
     widget.mealsData
         .where((element) => element.mealType == type)
         .forEach((element) {
-      data.meals.add(element.name);
-      data.kcal += element.nutritionalValues.kcal;
+      data.meals.add(element.quantity == 1 ? element.name : "${element.quantity} X ${element.name}");
+      data.kcal += element.nutritionalValues.kcal * element.quantity;
     });
 
     return data;

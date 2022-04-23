@@ -2,29 +2,24 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:food_vision/error/food_error.dart';
-import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/models/prediction.dart';
 
 import 'food_api_call.dart';
 
-class FoodViewModel with ChangeNotifier{
-
+class PredictViewModel with ChangeNotifier{
   FoodApiCall api;
-
-  List<Meal>? data;
   bool loading = false;
   FoodError? error;
-  DateTime date = DateTime.now();
 
-  FoodViewModel(this.api) {
-    getAll();
-  }
+  Prediction? prediction;
 
-  Future getAll() async{
+  PredictViewModel(this.api);
+
+  Future predictImage(File imageFile) async{
     loading = true;
     notifyListeners();
     try {
-      data = await api.getMealsOfToday(date);
+      prediction = await api.predictImage(imageFile);
       error = null;
     } catch(e){
       error = FoodError(e.toString());
@@ -32,6 +27,4 @@ class FoodViewModel with ChangeNotifier{
     loading = false;
     notifyListeners();
   }
-
-
 }

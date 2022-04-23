@@ -9,6 +9,8 @@ import 'package:food_vision/screens/fitness_app_theme.dart';
 import 'package:food_vision/screens/info_screen.dart';
 import 'package:food_vision/screens/loading_screen.dart';
 import 'package:food_vision/service/food_view_model.dart';
+import 'package:food_vision/service/add_view_model.dart';
+import 'package:food_vision/service/predict_view_model.dart';
 import 'package:food_vision/widgets/app_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -99,35 +101,17 @@ class _PredictionScreenState extends State<PredictionScreen> with TickerProvider
   }
 
   Widget _build(BuildContext context) {
-    if (Provider
-        .of<FoodViewModel>(context)
-        .loading) {
+    if (Provider.of<PredictViewModel>(context).loading) {
       return const LoadingScreen();
     }
-    if (Provider
-        .of<FoodViewModel>(context)
-        .error != null) {
-      return _getCameraPic(
-          ErrorScreen(error: "Error calling the api")
-      );
-    }
-    if (Provider
-        .of<FoodViewModel>(context)
-        .error == null) {
-      Prediction data = Provider
-          .of<FoodViewModel>(context)
-          .prediction!;
-      if (data.prediction < .6) {
-        return _getCameraPic(
-            ErrorScreen(error: "No food detected")
-        );
-      }
+    if (Provider.of<PredictViewModel>(context).error == null) {
+      Prediction data = Provider.of<PredictViewModel>(context, listen: false).prediction!;
       return _getCameraPic(InfoScreen(imageFile: widget.imageFile,
           prediction: data,
           mealType: widget.mealType));
     }
     return _getCameraPic(
-        ErrorScreen(error: Provider.of<FoodViewModel>(context).error!.message)
+        ErrorScreen(error: Provider.of<PredictViewModel>(context).error!.message)
     );
   }
 

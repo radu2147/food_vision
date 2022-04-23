@@ -7,24 +7,18 @@ import 'package:food_vision/models/prediction.dart';
 
 import 'food_api_call.dart';
 
-class FoodViewModel with ChangeNotifier{
-
+class AddViewModel with ChangeNotifier{
   FoodApiCall api;
-
-  List<Meal>? data;
   bool loading = false;
   FoodError? error;
-  DateTime date = DateTime.now();
 
-  FoodViewModel(this.api) {
-    getAll();
-  }
+  AddViewModel(this.api);
 
-  Future getAll() async{
+  Future add(Meal meal) async{
     loading = true;
     notifyListeners();
     try {
-      data = await api.getMealsOfToday(date);
+      await api.addMeal(meal);
       error = null;
     } catch(e){
       error = FoodError(e.toString());
@@ -32,6 +26,4 @@ class FoodViewModel with ChangeNotifier{
     loading = false;
     notifyListeners();
   }
-
-
 }

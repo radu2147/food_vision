@@ -41,8 +41,9 @@ class Meal{
   MealType mealType;
   String name;
   BigInt id;
+  int quantity;
 
-  Meal({required this.user, required this.date, required this.nutritionalValues, required this.mealType, required this.name, required this.id});
+  Meal({required this.user, required this.date, required this.nutritionalValues, required this.mealType, required this.name, required this.id, this.quantity = 1});
 
 
   static Meal fromJson(Map<String, dynamic> map) => Meal(
@@ -51,7 +52,8 @@ class Meal{
       name: map["name"] as String,
       mealType: _fromString(map["meal_type"] as String) ?? MealType.Snack,
       nutritionalValues: NutritionalValues.fromJson(map["nutritional_values"] as Map<String, dynamic>),
-      user: User.fromJson(map["user"] as Map<String, dynamic>)
+      user: User.fromJson(map["user"] as Map<String, dynamic>),
+      quantity: map["quantity"] as int
   );
 
   Map<String, dynamic> toJson() => {
@@ -60,7 +62,8 @@ class Meal{
     "meal_type": mealType.toText(),
     "name": name,
     "nutritional_values": nutritionalValues.toJson(),
-    "user": user.toJson()
+    "user": user.toJson(),
+    "quantity": quantity.toString()
   };
 
 }

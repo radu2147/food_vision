@@ -1,8 +1,8 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:food_vision/models/tablcon_data.dart';
 import 'package:food_vision/screens/fitness_app_theme.dart';
-import 'package:food_vision/widgets/hex_color.dart';
 
 class BottomBarView extends StatefulWidget {
   const BottomBarView(
@@ -65,7 +65,7 @@ class _BottomBarViewState extends State<BottomBarView>
                         const EdgeInsets.only(left: 8, right: 8, top: 4),
                         child: Row(
                           children: <Widget>[
-                            Expanded(
+                            /*Expanded(
                               child: TabIcons(
                                   tabIconData: widget.tabIconsList?[0],
                                   removeAllSelect: () {
@@ -108,7 +108,7 @@ class _BottomBarViewState extends State<BottomBarView>
                                         widget.tabIconsList?[3]);
                                     widget.changeIndex!(3);
                                   }),
-                            ),
+                            ),*/
                           ],
                         ),
                       ),

@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:food_vision/screens/fitness_app_theme.dart';
+import 'package:food_vision/service/food_view_model.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class MyAppBar extends StatefulWidget {
   DateTime date;
@@ -118,10 +121,15 @@ class _AppBarState extends State<MyAppBar>{
                                 borderRadius: const BorderRadius.all(
                                     Radius.circular(32.0)),
                                 onTap: () {},
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.keyboard_arrow_left,
+                                child: Center(
+                                  child: IconButton(icon: const Icon(
+                                    Icons.arrow_back,
                                     color: FitnessAppTheme.grey,
+                                  ), onPressed: () async {
+                                    Provider.of<FoodViewModel>(context, listen: false).date = Provider.of<FoodViewModel>(context, listen: false).date.subtract(Duration(days:1));
+                                    await Provider.of<FoodViewModel>(context, listen: false).getAll();
+                                  },
+
                                   ),
                                 ),
                               ),
@@ -132,19 +140,19 @@ class _AppBarState extends State<MyAppBar>{
                                 right: 8,
                               ),
                               child: Row(
-                                children: const <Widget>[
-                                  Padding(
+                                children:<Widget>[
+                                  const Padding(
                                     padding: EdgeInsets.only(right: 8),
                                     child: Icon(
                                       Icons.calendar_today,
                                       color: FitnessAppTheme.grey,
                                       size: 18,
-                                    ),
+                                    )
                                   ),
                                   Text(
-                                    '15 May',
+                                    "${Provider.of<FoodViewModel>(context, listen: false).date.day} ${DateFormat('MMMM').format(DateTime(0, Provider.of<FoodViewModel>(context, listen: false).date.month))}",
                                     textAlign: TextAlign.left,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontFamily: FitnessAppTheme.fontName,
                                       fontWeight: FontWeight.normal,
                                       fontSize: 18,
@@ -163,10 +171,18 @@ class _AppBarState extends State<MyAppBar>{
                                 borderRadius: const BorderRadius.all(
                                     Radius.circular(32.0)),
                                 onTap: () {},
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.keyboard_arrow_right,
+                                child: Center(
+                                  child: IconButton(icon: const Icon(
+                                    Icons.arrow_right,
                                     color: FitnessAppTheme.grey,
+                                  ), onPressed: () async {
+                                    if(Provider.of<FoodViewModel>(context, listen: false).date.day == DateTime.now().day){
+                                      return;
+                                    }
+                                    Provider.of<FoodViewModel>(context, listen: false).date = Provider.of<FoodViewModel>(context, listen: false).date.add(const Duration(days:1));
+                                    await Provider.of<FoodViewModel>(context, listen: false).getAll();
+                                  },
+
                                   ),
                                 ),
                               ),

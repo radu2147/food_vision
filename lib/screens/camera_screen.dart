@@ -6,6 +6,8 @@ import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/screens/prediction_screen.dart';
 import 'package:food_vision/service/camera_provider.dart';
 import 'package:food_vision/service/food_view_model.dart';
+import 'package:food_vision/service/add_view_model.dart';
+import 'package:food_vision/service/predict_view_model.dart';
 import 'package:provider/provider.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -94,7 +96,7 @@ class _CameraScreenState extends State<CameraScreen> {
                     var xFile = await _controller.takePicture();
                     capturedImage = File(xFile.path);
                     Navigator.push(context, MaterialPageRoute(builder: (context) => PredictionScreen(imageFile: capturedImage, mealType: widget.mealType,)));
-                    await Provider.of<FoodViewModel>(context, listen: false).predictImage(capturedImage);
+                    await Provider.of<PredictViewModel>(context, listen: false).predictImage(capturedImage);
                   },
                   child: Container(
                     height: 60,

@@ -28,7 +28,19 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
   double topBarOpacity = 0.0;
 
   get total{
-    return widget.data.isEmpty ? 0.0 : widget.data.map((e) => e.nutritionalValues.kcal).reduce((value, element) => value + element);
+    return widget.data.isEmpty ? 0.0 : widget.data.map((e) => e.nutritionalValues.kcal * e.quantity).reduce((value, element) => value + element);
+  }
+
+  get protein{
+    return widget.data.isEmpty ? 0.0 : widget.data.map((e) => e.nutritionalValues.protein * e.quantity).reduce((value, element) => value + element);
+  }
+
+  get carbs{
+    return widget.data.isEmpty ? 0.0 : widget.data.map((e) => e.nutritionalValues.carbs * e.quantity).reduce((value, element) => value + element);
+  }
+
+  get fat{
+    return widget.data.isEmpty ? 0.0 : widget.data.map((e) => e.nutritionalValues.fat * e.quantity).reduce((value, element) => value + element);
   }
 
   @override
@@ -46,7 +58,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
 
     listViews.add(
       TitleView(
-        titleTxt: 'Mediterranean diet',
+        titleTxt: 'Diet overview',
         subTxt: 'Details',
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
@@ -58,6 +70,9 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
     listViews.add(
       MediterranesnDietView(
         total: total,
+        protein: protein,
+        fat: fat,
+        carbs: carbs,
         animation: Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
             parent: widget.animationController!,
             curve:
@@ -112,11 +127,6 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
     // );
   }
 
-  Future<bool> getData() async {
-    await Future<dynamic>.delayed(const Duration(milliseconds: 50));
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -137,13 +147,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
   }
 
   Widget getMainListViewUI() {
-    return FutureBuilder<bool>(
-      future: getData(),
-      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-        if (!snapshot.hasData) {
-          return const SizedBox();
-        } else {
-          return ListView.builder(
+    return ListView.builder(
             controller: scrollController,
             padding: EdgeInsets.only(
               top: AppBar().preferredSize.height +
@@ -157,9 +161,6 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
               widget.animationController?.forward();
               return listViews[index];
             },
-          );
-        }
-      },
     );
   }
 

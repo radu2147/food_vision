@@ -165,7 +165,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () async {
                     var username = usernameController.value.text;
                     var password = passwordController.value.text;
-                    await Provider.of<AuthViewModel>(context, listen: false).login(User(username: username, password: password)).timeout(const Duration(seconds: 10));
+                    await Provider.of<AuthViewModel>(context, listen: false).login(User(username: username, password: password));
+                    await Provider.of<FoodViewModel>(context, listen: false).getAll();
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => FitnessAppHomeScreen(asnyc: true,)));
                   }),
             ),
@@ -387,7 +388,7 @@ class _SignupPageContent extends State<SignupPageContent> {
                       passwordController2.text != "") {
                     await Provider.of<AuthViewModel>(context, listen: false).register(User(username: usernameController.value.text, password: passwordController1.value.text));
                     await Provider.of<FoodViewModel>(context, listen: false).getAll();
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => FitnessAppHomeScreen(asnyc: true,)));
+                    //Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => FitnessAppHomeScreen(asnyc: true,)));
                   } else {
                     setState(() {
                       _isVisible = returnVisibility(passwordController1.text,

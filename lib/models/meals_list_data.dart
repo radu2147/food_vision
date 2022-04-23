@@ -50,26 +50,4 @@ class MealsListData {
   List<String> meals;
   double kcal;
 
-  static List<MealsListData> tabIconsList = <MealsListData>[
-    MealsListData(
-      titleTxt: MealType.Breakfast,
-      kcal: 525,
-      meals: <String>['Bread,', 'Peanut butter,', 'Apple'],
-    ),
-    MealsListData(
-      titleTxt: MealType.Lunch,
-      kcal: 602,
-      meals: <String>['Salmon,', 'Mixed veggies,', 'Avocado'],
-    ),
-    MealsListData(
-      titleTxt: MealType.Snack,
-      kcal: 0,
-      meals: <String>['Recommend:', '800 kcal'],
-    ),
-    MealsListData(
-      titleTxt: MealType.Dinner,
-      kcal: 0,
-      meals: <String>['Recommend:', '703 kcal'],
-    ),
-  ];
 }
