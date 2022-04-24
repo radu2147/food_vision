@@ -177,9 +177,9 @@ class _InfoScreenState extends State<InfoScreen>
                               padding: const EdgeInsets.all(8),
                               child: Row(
                                 children: <Widget>[
-                                  getTimeBoxUI((576 * quantity).toString(), 'Kcal'),
-                                  getTimeBoxUI('${12 * quantity}g', 'Protein'),
-                                  getTimeBoxUI('${30 * quantity}g', 'Fat'),
+                                  getTimeBoxUI((widget.prediction.nutritionalValues.kcal * quantity).toString(), 'Kcal'),
+                                  getTimeBoxUI('${widget.prediction.nutritionalValues.protein * quantity}g', 'Protein'),
+                                  getTimeBoxUI('${widget.prediction.nutritionalValues.fat * quantity}g', 'Fat'),
                                 ],
                               ),
                             ),
@@ -268,12 +268,7 @@ class _InfoScreenState extends State<InfoScreen>
                                                   user: User(username: "", password: ""),
                                                   id: BigInt.from(-1),
                                                   quantity: quantity,
-                                                  nutritionalValues: NutritionalValues(
-                                                    kcal: 140,
-                                                    protein: 10.0,
-                                                    fat: 5.0,
-                                                    carbs: 7.0
-                                                  ),
+                                                  nutritionalValues: widget.prediction.nutritionalValues
                                               ));
                                               Navigator.popUntil(context, (route) => route.isFirst);
                                               await Provider.of<FoodViewModel>(context, listen: false).getAll();
