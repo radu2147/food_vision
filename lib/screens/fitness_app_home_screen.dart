@@ -11,7 +11,6 @@ import 'package:food_vision/widgets/bottom_bar_view.dart';
 import 'package:provider/provider.dart';
 
 import 'camera_screen.dart';
-import 'fitness_app_theme.dart';
 import 'loading_screen.dart';
 
 class FitnessAppHomeScreen extends StatefulWidget {
@@ -31,9 +30,7 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
 
   List<TabIconData> tabIconsList = TabIconData.tabIconsList;
 
-  Widget tabBody = Container(
-    color: FitnessAppTheme.background,
-  );
+  late Widget tabBody;
 
   @override
   void initState() {
@@ -46,6 +43,7 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
         duration: const Duration(milliseconds: 600),
         vsync: this
     );
+    tabBody = MyDiaryScreen(data: Provider.of<FoodViewModel>(context, listen: false).data!, animationController: animationController,);
     super.initState();
   }
 
@@ -66,11 +64,12 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
           body: _getWidget(context)
         );
     }
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
               children: <Widget>[
-                MyDiaryScreen(data: widget.data!, animationController: animationController),
+                tabBody,
                 bottomBar(widget.data!),
               ],
             )
@@ -93,7 +92,7 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
     var data = Provider.of<FoodViewModel>(context).data!;
     return Stack(
       children: <Widget>[
-        MyDiaryScreen(data: data, animationController: animationController),
+        tabBody, //MyDiaryScreen(data: data, animationController: animationController),
         bottomBar(data),
       ],
     );
@@ -109,27 +108,25 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
           tabIconsList: tabIconsList,
           addClick: () {Navigator.push(context, MaterialPageRoute(builder: (context) => CameraScreen()));},
           changeIndex: (int index) {
-            if (index == 0 || index == 2) {
-              animationController?.reverse().then<dynamic>((data) {
-                if (!mounted) {
-                  return;
-                }
+            animationController?.reverse().then<dynamic>((data) {
+              if (!mounted) {
+                return;
+              }
+              if(index == 0) {
+
                 setState(() {
-                  tabBody =
-                      MyDiaryScreen(data: lst, animationController: animationController);
+                  tabBody = MyDiaryScreen(
+                      data: lst, animationController: animationController);
                 });
-              });
-            } else if (index == 1 || index == 3) {
-              animationController?.reverse().then<dynamic>((data) {
-                if (!mounted) {
-                  return;
-                }
+              }
+              else if(index == 1){
                 setState(() {
-                  tabBody =
-                      TrainingScreen(animationController: animationController);
+                  tabBody = TrainingScreen(
+                    animationController: animationController,
+                  );
                 });
-              });
-            }
+              }
+            });
           },
         ),
       ],

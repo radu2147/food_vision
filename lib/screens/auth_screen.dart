@@ -49,8 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     _isVisible = Provider.of<AuthViewModel>(context).error != null;
-    return SingleChildScrollView(
-        reverse: true,
+    return Padding(
         padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -96,6 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
+              replacement: SizedBox(),
             ),
 
             // Textfields for username and password fields
@@ -167,7 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     var password = passwordController.value.text;
                     await Provider.of<AuthViewModel>(context, listen: false).login(User(username: username, password: password));
                     await Provider.of<FoodViewModel>(context, listen: false).getAll();
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => FitnessAppHomeScreen(asnyc: true,)));
+                    //Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => FitnessAppHomeScreen(asnyc: true,)));
                   }),
             ),
 
@@ -245,8 +245,7 @@ class _SignupPageContent extends State<SignupPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      reverse: true,
+    return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -309,6 +308,7 @@ class _SignupPageContent extends State<SignupPageContent> {
                       border: InputBorder.none,
                       hintText: "Username",
                       contentPadding: EdgeInsets.all(20)),
+                  textInputAction: TextInputAction.next,
                   onEditingComplete: () => FocusScope.of(context).nextFocus(),
                 ),
                 const Divider(
@@ -321,6 +321,7 @@ class _SignupPageContent extends State<SignupPageContent> {
                     });
                   },
 
+                  textInputAction: TextInputAction.next,
                   controller: passwordController1, // Controller for Password
                   decoration: InputDecoration(
                       border: InputBorder.none,
@@ -338,6 +339,7 @@ class _SignupPageContent extends State<SignupPageContent> {
                         },
                       )),
                   obscureText: _isObscure1,
+                  onEditingComplete: () => FocusScope.of(context).nextFocus(),
                 ),
                 const Divider(
                   thickness: 3,
@@ -348,7 +350,7 @@ class _SignupPageContent extends State<SignupPageContent> {
                       _isVisible = false;
                     });
                   },
-
+                  textInputAction: TextInputAction.done,
                   controller: passwordController2, // Controller for Password
                   decoration: InputDecoration(
                       border: InputBorder.none,
