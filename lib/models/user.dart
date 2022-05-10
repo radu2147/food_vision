@@ -16,13 +16,15 @@ class User{
 }
 
 class Token{
-  String access_token;
-  String token_type;
+  String accessToken;
+  String tokenType;
+  String username;
 
-  Token({required this.access_token, required this.token_type});
+  Token({required this.accessToken, required this.tokenType, required this.username});
 
   static Token fromJson(Map<String, dynamic> body) => Token(
-      access_token: body["access_token"] as String,
-      token_type: body["token_type"] as String
+      accessToken: body["access_token"] as String,
+      tokenType: body["token_type"] as String,
+      username: body["username"] as String
   );
 }

@@ -166,7 +166,7 @@ class _TrainingScreenState extends State<TrainingScreen>
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  'Hello, radu!',
+                                  'Hello, ${Provider.of<AuthViewModel>(context, listen: false).data?.username}!',
                                   textAlign: TextAlign.left,
                                   style: TextStyle(
                                     fontFamily: FitnessAppTheme.fontName,

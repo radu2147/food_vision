@@ -23,19 +23,34 @@ class FoodApiCall{
     var storage = const FlutterSecureStorage();
     String? token = await storage.read(key: "token");
     var uri = Uri.parse("$url/meal?datetime=$date");
-    var resp = await http.get(uri, headers: {"Authorization": "Bearer ${token ?? ""}"}).timeout(const Duration(seconds: 20));
-    List<dynamic> values = jsonDecode(resp.body);
-    List<Meal> fin = [];
-    if (values.isNotEmpty) {
-      for (int i = 0; i < values.length; i++) {
-        if (values[i] != null) {
-          Map<String, dynamic> map = values[i];
-          var elem = Meal.fromJson(map);
-          fin.add(elem);
+    try {
+      var resp = await http.get(
+          uri, headers: {"Authorization": "Bearer ${token ?? ""}"}).timeout(
+          const Duration(seconds: 20));
+      if (resp.statusCode == 401) {
+        var error = jsonDecode(resp.body);
+        var er = FoodError(error["detail"], code: 401);
+        throw er;
+      }
+      List<dynamic> values = jsonDecode(resp.body);
+      List<Meal> fin = [];
+      if (values.isNotEmpty) {
+        for (int i = 0; i < values.length; i++) {
+          if (values[i] != null) {
+            Map<String, dynamic> map = values[i];
+            var elem = Meal.fromJson(map);
+            fin.add(elem);
+          }
         }
       }
+      return fin;
     }
-    return fin;
+    on FoodError{
+      rethrow;
+    }
+    catch(_){
+      throw FoodError("Something went wrong");
+    }
   }
 
   Future<Prediction> predictImage(File imageFile) async {

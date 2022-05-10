@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:food_vision/models/user.dart';
 import 'package:food_vision/screens/fitness_app_home_screen.dart';
 import 'package:food_vision/screens/fitness_app_theme.dart';
+import 'package:food_vision/screens/loading_screen.dart';
 import 'package:food_vision/service/auth_view_model.dart';
 import 'package:food_vision/service/food_view_model.dart';
 import 'package:provider/provider.dart';
@@ -38,17 +39,14 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController passwordController = TextEditingController();
   bool _isObscure = true;
   bool _isVisible = false;
-
-  final TapGestureRecognizer _gestureRecognizer = TapGestureRecognizer()
-    ..onTap = () {
-      if (kDebugMode) {
-        print("Hello world from _gestureRecognizer");
-      }
-    };
+  bool _showLoading = false;
+  String error = "";
 
   @override
   Widget build(BuildContext context) {
-    _isVisible = Provider.of<AuthViewModel>(context).error != null;
+    if(_showLoading){
+      return const LoadingScreen();
+    }
     return Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -87,9 +85,9 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Container(
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.all(10),
-                child: const Text(
-                  "Wrong credentials entered",
-                  style: TextStyle(
+                child: Text(
+                  error,
+                  style: const TextStyle(
                     color: Colors.red,
                     fontSize: 10,
                   ),
@@ -165,9 +163,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () async {
                     var username = usernameController.value.text;
                     var password = passwordController.value.text;
+                    setState(() {
+                      _showLoading = true;
+                    });
                     await Provider.of<AuthViewModel>(context, listen: false).login(User(username: username, password: password));
-                    await Provider.of<FoodViewModel>(context, listen: false).getAll();
-                    //Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => FitnessAppHomeScreen(asnyc: true,)));
+                    if(mounted){
+                      if(Provider.of<AuthViewModel>(context, listen: false).error != null){
+                        setState(() {
+                          _showLoading = false;
+                          _isVisible = true;
+                          error = Provider.of<AuthViewModel>(context, listen: false).error!.message;
+                        });
+                        return;
+                      }
+                    }
+                    await Provider.of<FoodViewModel>(context, listen: false).getAllToday();
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const FitnessAppHomeScreen()));
                   }),
             ),
 
@@ -230,7 +241,10 @@ class _SignupPageContent extends State<SignupPageContent> {
   bool _isVisible = false;
   bool _isObscure1 = true;
   bool _isObscure2 = true;
+  String error = "";
   String returnVisibilityString = "";
+
+  bool _showLoading = false;
 
   bool returnVisibility(String password1, String password2, String username) {
     if (password1 != password2) {
@@ -245,6 +259,9 @@ class _SignupPageContent extends State<SignupPageContent> {
 
   @override
   Widget build(BuildContext context) {
+    if(_showLoading){
+      return const LoadingScreen();
+    }
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -279,7 +296,7 @@ class _SignupPageContent extends State<SignupPageContent> {
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.all(10),
               child: Text(
-                returnVisibilityString,
+                error,
                 style: const TextStyle(
                   color: Colors.red,
                   fontSize: 10,
@@ -388,9 +405,22 @@ class _SignupPageContent extends State<SignupPageContent> {
                   if (usernameController.text != "" &&
                       passwordController1.text == passwordController2.text &&
                       passwordController2.text != "") {
+                    setState(() {
+                      _showLoading = true;
+                    });
                     await Provider.of<AuthViewModel>(context, listen: false).register(User(username: usernameController.value.text, password: passwordController1.value.text));
-                    await Provider.of<FoodViewModel>(context, listen: false).getAll();
-                    //Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => FitnessAppHomeScreen(asnyc: true,)));
+                    if(mounted){
+                      if(Provider.of<AuthViewModel>(context, listen: false).error != null){
+                        setState(() {
+                          _showLoading = false;
+                          _isVisible = true;
+                          error = Provider.of<AuthViewModel>(context, listen: false).error!.message;
+                        });
+                        return;
+                      }
+                    }
+                    await Provider.of<FoodViewModel>(context, listen: false).getAllToday();
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const FitnessAppHomeScreen()));
                   } else {
                     setState(() {
                       _isVisible = returnVisibility(passwordController1.text,

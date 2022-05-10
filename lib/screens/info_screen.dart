@@ -271,7 +271,7 @@ class _InfoScreenState extends State<InfoScreen>
                                                   nutritionalValues: widget.prediction.nutritionalValues
                                               ));
                                               Navigator.popUntil(context, (route) => route.isFirst);
-                                              await Provider.of<FoodViewModel>(context, listen: false).getAll();
+                                              await Provider.of<FoodViewModel>(context, listen: false).getAllToday();
                                             },
                                             splashColor: Colors.white.withOpacity(0.1),
                                             highlightColor: Colors.transparent,

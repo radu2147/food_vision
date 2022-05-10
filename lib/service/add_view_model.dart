@@ -1,9 +1,7 @@
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:food_vision/error/food_error.dart';
 import 'package:food_vision/models/meal.dart';
-import 'package:food_vision/models/prediction.dart';
 
 import 'food_api_call.dart';
 

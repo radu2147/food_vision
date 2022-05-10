@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/screens/fitness_app_theme.dart';
+import 'package:food_vision/service/food_view_model.dart';
 import 'package:food_vision/widgets/app_bar.dart';
 import 'package:food_vision/widgets/title_view.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/meals_list_view.dart';
 import '../widgets/mediterranean_diet_view.dart';
@@ -16,10 +18,15 @@ class MyDiaryScreen extends StatefulWidget {
   final AnimationController? animationController;
   @override
   _MyDiaryScreenState createState() => _MyDiaryScreenState();
+
+  @override
+  void showSnackBar(String text) {
+
+  }
 }
 
 class _MyDiaryScreenState extends State<MyDiaryScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin{
   Animation<double>? topBarAnimation;
 
   List<Widget> listViews = <Widget>[];
@@ -104,8 +111,23 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
     );
   }
 
+  Future<void> showSnackBar(String elem) async{
+    final snackBar = SnackBar(
+      content: Text("Error: " + elem),
+      action: SnackBarAction(
+        label: 'Close',
+        onPressed: () {},
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if(Provider.of<FoodViewModel>(context).error != null) {
+      showSnackBar("Test");
+      Provider.of<FoodViewModel>(context, listen: false).error = null;
+    }
     return Container(
       color: FitnessAppTheme.background,
       child: Scaffold(

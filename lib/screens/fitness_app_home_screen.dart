@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/models/tablcon_data.dart';
-import 'package:food_vision/screens/auth_screen.dart';
-import 'package:food_vision/screens/error_screen.dart';
 import 'package:food_vision/screens/my_diary_screen.dart';
 import 'package:food_vision/screens/training_screen.dart';
-import 'package:food_vision/service/auth_view_model.dart';
 import 'package:food_vision/service/food_view_model.dart';
 import 'package:food_vision/widgets/bottom_bar_view.dart';
 import 'package:provider/provider.dart';
 
+import 'auth_screen.dart';
 import 'camera_screen.dart';
 import 'loading_screen.dart';
 
 class FitnessAppHomeScreen extends StatefulWidget {
 
-  final List<Meal>? data;
-  bool asnyc;
 
-  FitnessAppHomeScreen({this.data,required this.asnyc});
+  const FitnessAppHomeScreen();
 
   @override
   _FitnessAppHomeScreenState createState() => _FitnessAppHomeScreenState();
+
 }
 
 class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
@@ -31,6 +27,8 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
   List<TabIconData> tabIconsList = TabIconData.tabIconsList;
 
   late Widget tabBody;
+  late MyDiaryScreen diaryScreen;
+  late TrainingScreen profileScreen;
 
   @override
   void initState() {
@@ -43,7 +41,11 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
         duration: const Duration(milliseconds: 600),
         vsync: this
     );
-    tabBody = MyDiaryScreen(data: Provider.of<FoodViewModel>(context, listen: false).data!, animationController: animationController,);
+    diaryScreen = MyDiaryScreen(data: Provider.of<FoodViewModel>(context, listen: false).data ?? [], animationController: animationController,);
+    profileScreen = TrainingScreen(
+      animationController: animationController,
+    );
+    tabBody = diaryScreen;
     super.initState();
   }
 
@@ -55,30 +57,17 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    if(Provider.of<AuthViewModel>(context).error != null){
+    if(Provider.of<FoodViewModel>(context).is401()){
       return AuthScreen();
     }
-    if(widget.asnyc) {
-      return Scaffold(
-          backgroundColor: Colors.transparent,
-          body: _getWidget(context)
-        );
-    }
-
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Stack(
-              children: <Widget>[
-                tabBody,
-                bottomBar(widget.data!),
-              ],
-            )
-
-
-      );
+        backgroundColor: Colors.transparent,
+        body: _getWidget(context)
+    );
   }
 
   Widget _getWidget(BuildContext context){
+
     if (Provider.of<FoodViewModel>(context).loading) {
       return Stack(
         children: const <Widget>[
@@ -86,19 +75,18 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
         ],
       );
     }
-    if(Provider.of<FoodViewModel>(context).error != null){
-      return ErrorScreen(error: Provider.of<FoodViewModel>(context).error!.message,);
-    }
     var data = Provider.of<FoodViewModel>(context).data!;
+    diaryScreen.data = data;
     return Stack(
       children: <Widget>[
         tabBody, //MyDiaryScreen(data: data, animationController: animationController),
-        bottomBar(data),
+        bottomBar(),
       ],
     );
   }
 
-  Widget bottomBar(List<Meal> lst) {
+
+  Widget bottomBar() {
     return Column(
       children: <Widget>[
         const Expanded(
@@ -115,15 +103,12 @@ class _FitnessAppHomeScreenState extends State<FitnessAppHomeScreen>
               if(index == 0) {
 
                 setState(() {
-                  tabBody = MyDiaryScreen(
-                      data: lst, animationController: animationController);
+                  tabBody = diaryScreen;
                 });
               }
               else if(index == 1){
                 setState(() {
-                  tabBody = TrainingScreen(
-                    animationController: animationController,
-                  );
+                  tabBody = profileScreen;
                 });
               }
             });

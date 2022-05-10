@@ -126,8 +126,7 @@ class _AppBarState extends State<MyAppBar>{
                                     Icons.arrow_back,
                                     color: FitnessAppTheme.grey,
                                   ), onPressed: () async {
-                                    Provider.of<FoodViewModel>(context, listen: false).date = Provider.of<FoodViewModel>(context, listen: false).date.subtract(Duration(days:1));
-                                    await Provider.of<FoodViewModel>(context, listen: false).getAll();
+                                    await Provider.of<FoodViewModel>(context, listen: false).getAllYesterday();
                                   },
 
                                   ),
@@ -176,11 +175,8 @@ class _AppBarState extends State<MyAppBar>{
                                     Icons.arrow_right,
                                     color: FitnessAppTheme.grey,
                                   ), onPressed: () async {
-                                    if(Provider.of<FoodViewModel>(context, listen: false).date.day == DateTime.now().day){
-                                      return;
-                                    }
-                                    Provider.of<FoodViewModel>(context, listen: false).date = Provider.of<FoodViewModel>(context, listen: false).date.add(const Duration(days:1));
-                                    await Provider.of<FoodViewModel>(context, listen: false).getAll();
+
+                                    await Provider.of<FoodViewModel>(context, listen: false).getAllTomorrow();
                                   },
 
                                   ),

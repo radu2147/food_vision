@@ -60,6 +60,7 @@ class _ErrorScreenState extends State<ErrorScreen>
       padding: const EdgeInsets.only(left: 8, right: 8),
       child: SingleChildScrollView(
         child: Container(
+          color: AppTheme.nearlyWhite,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,

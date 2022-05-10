@@ -20,7 +20,7 @@ class AuthViewModel with ChangeNotifier{
     notifyListeners();
     try {
       data = await api.login(user.username, user.password);
-      _writeToStorage();
+      await _writeToStorage();
       error = null;
     } catch(e){
       error = AuthError(e.toString());
@@ -29,9 +29,10 @@ class AuthViewModel with ChangeNotifier{
     notifyListeners();
   }
 
-  void _writeToStorage() {
+  Future _writeToStorage() async {
     var storage = const FlutterSecureStorage();
-    storage.write(key: "token", value: data!.access_token);
+    await storage.write(key: "token", value: data!.accessToken);
+    await storage.write(key: "username", value: data!.username);
   }
 
   Future register(User user) async{
@@ -39,7 +40,7 @@ class AuthViewModel with ChangeNotifier{
     notifyListeners();
     try {
       data = await api.register(user.username, user.password);
-      _writeToStorage();
+      await _writeToStorage();
       error = null;
     } catch(e){
       error = AuthError(e.toString());

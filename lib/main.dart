@@ -19,13 +19,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized(); //Ensure plugin services are initialized
   final cameras = await availableCameras();
   var token = await const FlutterSecureStorage().read(key: "token");
+  var username = await const FlutterSecureStorage().read(key: "username");
   FoodViewModel foodVM = FoodViewModel(FoodApiCall());
   AddViewModel addVM = AddViewModel(FoodApiCall());
   PredictViewModel predictVM = PredictViewModel(FoodApiCall());
   AuthViewModel authVM = AuthViewModel(AuthApiCall());
   CameraProvider cameraProvider = CameraProvider(cameras);
-  if(token != null){
-    authVM.data = Token(access_token: token, token_type: "bearer");
+  if(token != null && username != null){
+    authVM.data = Token(accessToken: token, tokenType: "bearer", username: username);
   }
 
   runApp(MultiProvider(
@@ -40,9 +41,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+
   final List<CameraDescription> cameras;
-
-
   final String? token;
 
   MyApp({Key? key, required this.cameras, this.token}) : super(key: key);
@@ -62,13 +62,10 @@ class MyApp extends StatelessWidget {
   }
 
   Widget _getWidget(BuildContext context){
-    if(Provider.of<FoodViewModel>(context).error != null || Provider.of<AuthViewModel>(context).error != null){
+    if(Provider.of<AuthViewModel>(context).error != null || Provider.of<FoodViewModel>(context).is401()){
       return AuthScreen();
     }
-    if(Provider.of<FoodViewModel>(context).loading || Provider.of<AuthViewModel>(context).loading){
-      return LoadingScreen();
-    }
-    return FitnessAppHomeScreen(data: Provider.of<FoodViewModel>(context).data, asnyc: false,);
+    return const FitnessAppHomeScreen();
   }
 
 }
