@@ -19,10 +19,6 @@ class MyDiaryScreen extends StatefulWidget {
   @override
   _MyDiaryScreenState createState() => _MyDiaryScreenState();
 
-  @override
-  void showSnackBar(String text) {
-
-  }
 }
 
 class _MyDiaryScreenState extends State<MyDiaryScreen>
@@ -125,7 +121,7 @@ class _MyDiaryScreenState extends State<MyDiaryScreen>
   @override
   Widget build(BuildContext context) {
     if(Provider.of<FoodViewModel>(context).error != null) {
-      showSnackBar("Test");
+      showSnackBar(Provider.of<FoodViewModel>(context, listen: false).error!.message);
       Provider.of<FoodViewModel>(context, listen: false).error = null;
     }
     return Container(

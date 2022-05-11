@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:food_vision/models/meal.dart';
 import 'package:food_vision/screens/prediction_screen.dart';
 import 'package:food_vision/service/camera_provider.dart';
-import 'package:food_vision/service/food_view_model.dart';
-import 'package:food_vision/service/add_view_model.dart';
 import 'package:food_vision/service/predict_view_model.dart';
 import 'package:provider/provider.dart';
 

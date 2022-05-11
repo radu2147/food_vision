@@ -2,11 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:food_vision/models/meal.dart';
-import 'package:food_vision/models/nutritional_values.dart';
-import 'package:food_vision/models/prediction.dart';
 import 'package:food_vision/models/user.dart';
 import 'package:food_vision/service/food_view_model.dart';
-import 'package:food_vision/service/add_view_model.dart';
+import 'package:food_vision/service/predict_view_model.dart';
 import 'package:food_vision/widgets/counter_view.dart';
 import 'package:provider/provider.dart';
 
@@ -16,10 +14,10 @@ import 'fitness_app_theme.dart';
 class InfoScreen extends StatefulWidget {
 
   File imageFile;
-  Prediction prediction;
   MealType? mealType;
+  BuildContext context;
 
-  InfoScreen({Key? key, required this.imageFile, required this.prediction, this.mealType}) : super(key: key);
+  InfoScreen({Key? key, required this.imageFile, required this.context, this.mealType}) : super(key: key);
 
   @override
   _InfoScreenState createState() => _InfoScreenState();
@@ -85,6 +83,8 @@ class _InfoScreenState extends State<InfoScreen>
         (MediaQuery.of(context).size.width / 1.2) +
         24.0;
 
+    var prediction = Provider.of<PredictViewModel>(context, listen: false).prediction!;
+
     return Padding(
                   padding: const EdgeInsets.only(left: 8, right: 8),
                   child: SingleChildScrollView(
@@ -102,7 +102,7 @@ class _InfoScreenState extends State<InfoScreen>
                             padding: const EdgeInsets.only(
                                 top: 32.0, left: 18, right: 16),
                             child: Row(children: [Text(
-                              widget.prediction.foodClass,
+                              prediction.foodClass,
                               textAlign: TextAlign.left,
                               style: const TextStyle(
                                 fontFamily: FitnessAppTheme.fontName,
@@ -177,9 +177,9 @@ class _InfoScreenState extends State<InfoScreen>
                               padding: const EdgeInsets.all(8),
                               child: Row(
                                 children: <Widget>[
-                                  getTimeBoxUI((widget.prediction.nutritionalValues.kcal * quantity).toString(), 'Kcal'),
-                                  getTimeBoxUI('${widget.prediction.nutritionalValues.protein * quantity}g', 'Protein'),
-                                  getTimeBoxUI('${widget.prediction.nutritionalValues.fat * quantity}g', 'Fat'),
+                                  getTimeBoxUI((prediction.nutritionalValues.kcal * quantity).toString(), 'Kcal'),
+                                  getTimeBoxUI('${prediction.nutritionalValues.protein * quantity}g', 'Protein'),
+                                  getTimeBoxUI('${prediction.nutritionalValues.fat * quantity}g', 'Fat'),
                                 ],
                               ),
                             ),
@@ -261,17 +261,23 @@ class _InfoScreenState extends State<InfoScreen>
                                           color: Colors.transparent,
                                           child: InkWell(
                                             onTap: () async{
-                                              await Provider.of<AddViewModel>(context, listen: false).add(Meal(
-                                                  name: widget.prediction.foodClass,
+                                              var err = await Provider.of<PredictViewModel>(context, listen: false).add(Meal(
+                                                  name: prediction.foodClass,
                                                   mealType: dropdownValue,
                                                   date: Provider.of<FoodViewModel>(context, listen: false).date,
                                                   user: User(username: "", password: ""),
                                                   id: BigInt.from(-1),
                                                   quantity: quantity,
-                                                  nutritionalValues: widget.prediction.nutritionalValues
+                                                  nutritionalValues: prediction.nutritionalValues
                                               ));
-                                              Navigator.popUntil(context, (route) => route.isFirst);
-                                              await Provider.of<FoodViewModel>(context, listen: false).getAllToday();
+                                              if(err == null) {
+                                                Navigator.popUntil(widget.context, (route) => route.isFirst);
+                                                await Provider.of<
+                                                    FoodViewModel>(
+                                                    widget.context, listen: false)
+                                                    .getAllToday();
+                                              }
+
                                             },
                                             splashColor: Colors.white.withOpacity(0.1),
                                             highlightColor: Colors.transparent,

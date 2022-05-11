@@ -15,8 +15,22 @@ class FoodApiCall{
   Future addMeal(Meal meal) async {
     var uri = Uri.parse("$url/meal");
     var token = await FlutterSecureStorage().read(key: "token");
-    var resp = await http.post(uri, body: jsonEncode(meal.toJson()), headers: {"Content-type": "application/json", "Authorization": "Bearer ${token ?? ""}"}).timeout(const Duration(seconds: 20));
-    var body = jsonDecode(resp.body);
+    try {
+      var resp = await http.post(uri, body: jsonEncode(meal.toJson()),
+          headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer ${token ?? ""}"
+          }).timeout(const Duration(seconds: 20));
+      if (resp.statusCode == 401) {
+        var error = jsonDecode(resp.body);
+        var er = FoodError(error["detail"], code: 401);
+        throw er;
+      }
+    }on FoodError{
+      rethrow;
+    } catch(_){
+      throw FoodError("Something went wrong");
+    }
   }
 
   Future<List<Meal>> getMealsOfToday(DateTime date) async{
@@ -59,16 +73,24 @@ class FoodApiCall{
     var length = await imageFile.length();
     var uri = Uri.parse("$url/uploadfile/");
     print("connection established.");
-    var request = http.MultipartRequest("POST", uri);
-    var multipartFile = http.MultipartFile("file", stream, length, filename: basename(imageFile.path));
-    request.files.add(multipartFile);
-    var response = await request.send().timeout(const Duration(seconds: 40));
-    var respBody = await http.Response.fromStream(response);
-    if(respBody.statusCode != 200){
-      var error = jsonDecode(respBody.body);
-      throw Exception(error["detail"]);
-    }
+    try {
+      var request = http.MultipartRequest("POST", uri);
+      var multipartFile = http.MultipartFile(
+          "file", stream, length, filename: basename(imageFile.path));
+      request.files.add(multipartFile);
+      var response = await request.send().timeout(const Duration(seconds: 40));
+      var resp = await http.Response.fromStream(response);
+      if (resp.statusCode == 401) {
+        var error = jsonDecode(resp.body);
+        var er = FoodError(error["detail"], code: 401);
+        throw er;
+      }
 
-    return Prediction.fromJson(jsonDecode(respBody.body));
+      return Prediction.fromJson(jsonDecode(resp.body));
+    } on FoodError catch(_){
+      rethrow;
+    } catch(e){
+      throw FoodError("Something went wrong");
+    }
   }
 }

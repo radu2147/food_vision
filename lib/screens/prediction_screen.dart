@@ -3,13 +3,10 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:food_vision/models/meal.dart';
-import 'package:food_vision/models/prediction.dart';
 import 'package:food_vision/screens/error_screen.dart';
 import 'package:food_vision/screens/fitness_app_theme.dart';
 import 'package:food_vision/screens/info_screen.dart';
 import 'package:food_vision/screens/loading_screen.dart';
-import 'package:food_vision/service/food_view_model.dart';
-import 'package:food_vision/service/add_view_model.dart';
 import 'package:food_vision/service/predict_view_model.dart';
 import 'package:food_vision/widgets/app_bar.dart';
 import 'package:provider/provider.dart';
@@ -105,9 +102,8 @@ class _PredictionScreenState extends State<PredictionScreen> with TickerProvider
       return const LoadingScreen();
     }
     if (Provider.of<PredictViewModel>(context).error == null) {
-      Prediction data = Provider.of<PredictViewModel>(context, listen: false).prediction!;
       return _getCameraPic(InfoScreen(imageFile: widget.imageFile,
-          prediction: data,
+          context: context,
           mealType: widget.mealType));
     }
     return _getCameraPic(

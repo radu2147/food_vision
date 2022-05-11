@@ -175,8 +175,11 @@ class _AppBarState extends State<MyAppBar>{
                                     Icons.arrow_right,
                                     color: FitnessAppTheme.grey,
                                   ), onPressed: () async {
-
-                                    await Provider.of<FoodViewModel>(context, listen: false).getAllTomorrow();
+                                    if(Provider.of<FoodViewModel>(context, listen: false).date.day != DateTime.now().day) {
+                                      await Provider.of<FoodViewModel>(
+                                          context, listen: false)
+                                          .getAllTomorrow();
+                                    }
                                   },
 
                                   ),
